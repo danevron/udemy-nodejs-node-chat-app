@@ -3,6 +3,8 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
+const {generateMessage} = require('./utils/message');
+
 let app = express();
 let server = http.createServer(app);
 
@@ -15,12 +17,15 @@ app.use(express.static(publicPath));
 io.on('connection', (socket) => {
   console.log('New client connected');
 
+  socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat room'));
+  socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
+
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
 
   socket.on('createMessage', (message) => {
-    io.emit('newMessage', Object.assign(message, {createdAt: new Date().getTime()}));
+    io.emit('newMessage', generateMessage(message.from, message.text));
   });
 });
 
