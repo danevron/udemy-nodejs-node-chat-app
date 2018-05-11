@@ -18,6 +18,10 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
+
+  socket.on('createMessage', (message) => {
+    socket.emit('newMessage', Object.assign(message, {createdAt: new Date()}));
+  });
 });
 
 server.listen(port, () => {
